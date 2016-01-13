@@ -14,20 +14,20 @@
 // Progress Bar Defaults
 #define DefaultProgressBarProgressColor [UIColor colorWithRed:0.71 green:0.099 blue:0.099 alpha:0.7]
 #define DefaultProgressBarTrackColor [UIColor colorWithRed:1 green:1 blue:1 alpha:0.7]
-const CGFloat DefaultProgressBarWidth = 33.0f;
+static CGFloat const DefaultProgressBarWidth = 33.0f;
 
 // Hint View Defaults
 #define DefaultHintBackgroundColor [UIColor colorWithWhite:0 alpha:0.7]
 #define DefaultHintTextFont [UIFont fontWithName:@"HelveticaNeue-CondensedBlack" size:30.0f]
 #define DefaultHintTextColor [UIColor whiteColor]
-const CGFloat DefaultHintSpacing = 20.0f;
-const StringGenerationBlock DefaultHintTextGenerationBlock = ^NSString *(CGFloat progress) {
-    return [NSString stringWithFormat:@"%.0f%%", progress * 100];
+static CGFloat const DefaultHintSpacing = 20.0f;
+static StringGenerationBlock const DefaultHintTextGenerationBlock = ^NSString * (CGFloat progress) {
+	return [NSString stringWithFormat:@"%.0f%%", progress * 100];
 };
 
 // Animation Constants
-const CGFloat AnimationChangeTimeDuration = 0.2f;
-const CGFloat AnimationChangeTimeStep = 0.01f;
+static CGFloat const AnimationChangeTimeDuration = 0.2f;
+static CGFloat const AnimationChangeTimeStep = 0.01f;
 
 @interface CircleProgressBar (Private)
 
@@ -74,7 +74,7 @@ const CGFloat AnimationChangeTimeStep = 0.01f;
     [self setProgress:progress animated:animated duration:AnimationChangeTimeDuration];
 }
 
-- (void)setProgress:(CGFloat)progress animated:(BOOL)animated duration:(CGFloat)duration; {
+- (void)setProgress:(CGFloat)progress animated:(BOOL)animated duration:(CGFloat)duration {
     progress = [self progressAccordingToBounds:progress];
     if (_progress == progress) {
         return;

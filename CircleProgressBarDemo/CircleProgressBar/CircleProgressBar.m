@@ -132,6 +132,11 @@ static CGFloat const AnimationChangeTimeStep = 0.01f;
     [self setNeedsDisplay];
 }
 
+- (void)setProgressBarProgressGradientColors:(NSArray *)progressBarProgressGradientColors {
+	_progressBarProgressGradientColors = progressBarProgressGradientColors;
+	[self setNeedsDisplay];
+}
+
 - (void)setProgressBarTrackColor:(UIColor *)progressBarTrackColor {
     _progressBarTrackColor = progressBarTrackColor;
     [self setNeedsDisplay];
@@ -216,19 +221,54 @@ static CGFloat const AnimationChangeTimeStep = 0.01f;
         barWidth = radius;
     }
     
-    CGContextSetFillColorWithColor(context, self.progressBarProgressColorForDrawing.CGColor);
-    CGContextBeginPath(context);
-    CGContextAddArc(context, center.x, center.y, radius, DEGREES_TO_RADIANS(_startAngle), DEGREES_TO_RADIANS(progressAngle), 0);
-    CGContextAddArc(context, center.x, center.y, radius - barWidth, DEGREES_TO_RADIANS(progressAngle), DEGREES_TO_RADIANS(_startAngle), 1);
-    CGContextClosePath(context);
-    CGContextFillPath(context);
-    
-    CGContextSetFillColorWithColor(context, self.progressBarTrackColorForDrawing.CGColor);
-    CGContextBeginPath(context);
-    CGContextAddArc(context, center.x, center.y, radius, DEGREES_TO_RADIANS(progressAngle), DEGREES_TO_RADIANS(_startAngle + 360), 0);
-    CGContextAddArc(context, center.x, center.y, radius - barWidth, DEGREES_TO_RADIANS(_startAngle + 360), DEGREES_TO_RADIANS(progressAngle), 1);
-    CGContextClosePath(context);
-    CGContextFillPath(context);
+	// Create path for 'progress'
+	CGContextBeginPath(context);
+	CGContextAddArc(context, center.x, center.y, radius, DEGREES_TO_RADIANS(_startAngle), DEGREES_TO_RADIANS(progressAngle), 0);
+	CGContextAddArc(context, center.x, center.y, radius - barWidth, DEGREES_TO_RADIANS(progressAngle), DEGREES_TO_RADIANS(_startAngle), 1);
+	CGContextClosePath(context);
+	
+	// Fill path
+	CGContextSaveGState(context);
+	{
+		// Gradient
+		if (self.progressBarProgressGradientColors.count > 1)
+		{
+			// Clip
+			CGContextClip(context);
+			
+			// Gradient start/end
+			CGPoint startPoint = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMinY(self.bounds));
+			CGPoint endPoint = CGPointMake(CGRectGetMidX(self.bounds), CGRectGetMaxY(self.bounds));
+			
+			// Color
+			CGColorSpaceRef colorSpace = CGColorSpaceCreateDeviceRGB();
+			NSMutableArray *cgColors = [NSMutableArray arrayWithCapacity:self.progressBarProgressGradientColors.count];
+			for (UIColor *color in self.progressBarProgressGradientColors)
+			{
+				[cgColors addObject:(__bridge id)color.CGColor];
+			}
+			CGGradientRef gradient = CGGradientCreateWithColors(colorSpace, (__bridge CFArrayRef)cgColors, NULL);
+			
+			// Draw
+			CGContextDrawLinearGradient(context, gradient, startPoint, endPoint, 0);
+		}
+		// Solid
+		else
+		{
+			// Set color and fill
+			CGContextSetFillColorWithColor(context, self.progressBarProgressColorForDrawing.CGColor);
+			CGContextFillPath(context);
+		}
+	}
+	CGContextRestoreGState(context);
+	
+	// Draw Track
+	CGContextSetFillColorWithColor(context, self.progressBarTrackColorForDrawing.CGColor);
+	CGContextBeginPath(context);
+	CGContextAddArc(context, center.x, center.y, radius, DEGREES_TO_RADIANS(progressAngle), DEGREES_TO_RADIANS(_startAngle + 360), 0);
+	CGContextAddArc(context, center.x, center.y, radius - barWidth, DEGREES_TO_RADIANS(_startAngle + 360), DEGREES_TO_RADIANS(progressAngle), 1);
+	CGContextClosePath(context);
+	CGContextFillPath(context);
 }
 
 #pragma mark - Hint Drawing

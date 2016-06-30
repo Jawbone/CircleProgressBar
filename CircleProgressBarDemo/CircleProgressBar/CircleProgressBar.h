@@ -29,6 +29,8 @@ IB_DESIGNABLE
 @property (nonatomic) IBInspectable CGFloat progressBarWidth;
 /// @brief Progress color in Progress Bar
 @property (nonatomic) IBInspectable UIColor *progressBarProgressColor;
+/// @brief Progress gradient colors in Progress Bar (colors are evenly distributed)
+@property (nonatomic, strong) NSArray *progressBarProgressGradientColors;
 /// @brief Track color in Progress Bar
 @property (nonatomic) IBInspectable UIColor *progressBarTrackColor;
 /// @brief Start Angle
